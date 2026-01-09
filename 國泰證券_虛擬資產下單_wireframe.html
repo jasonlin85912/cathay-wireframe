@@ -1,0 +1,465 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>國泰證券 App｜虛擬資產下單 互動式 Wireframe</title>
+<style>
+  :root{
+    --bg:#0f1216; --panel:#161a20; --card:#1c2128; --text:#e9eef7; --muted:#a9b4c5;
+    --accent:#31c48d; --danger:#ff6b6b; --warn:#f7b731; --blue:#3da9fc; --border:#2b3340;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family: system-ui, -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;}
+  header{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);background:rgba(0,0,0,0.3);position:sticky;top:0;z-index:10}
+  .btn{padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);cursor:pointer}
+  .btn.primary{background:var(--accent);border-color:transparent;color:#062b22;font-weight:600}
+  .btn.danger{background:var(--danger);color:#2b0b0b;border-color:transparent}
+  .btn.warn{background:var(--warn);color:#2b2306;border-color:transparent}
+  .btn.ghost{background:transparent}
+  .btn:disabled{opacity:0.4;cursor:not-allowed}
+  .container{max-width:1100px;margin:24px auto;padding:0 16px}
+  .grid{display:grid;grid-template-columns: 1.1fr 0.9fr;gap:16px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px}
+  .section-title{font-weight:700;margin-bottom:8px}
+  .pill{padding:6px 10px;border:1px solid var(--border);border-radius:999px;margin-right:8px;display:inline-flex;gap:8px;align-items:center;cursor:pointer}
+  .pill.active{background:var(--blue);border-color:transparent;color:#08121f}
+  .kv{display:flex;gap:8px;align-items:center;margin-bottom:6px;color:var(--muted)}
+  input, select{width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;background:#11161c;color:var(--text)}
+  label{font-size:12px;color:var(--muted);margin-bottom:6px;display:block}
+  .row{display:flex;gap:12px}
+  .row>div{flex:1}
+  .toggle{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .toggle button{flex:1;padding:10px;background:#131820;color:var(--text);border:none;cursor:pointer}
+  .toggle button.active{background:var(--blue);color:#08121f;font-weight:700}
+  .tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .tab{padding:8px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer}
+  .tab.active{background:var(--card);border-color:var(--blue)}
+  .mini{font-size:12px;color:var(--muted)}
+  .fee-list{display:grid;grid-template-columns: 1fr auto;gap:6px;margin-top:8px}
+  .progress{height:8px;background:#0b0e13;border-radius:999px;overflow:hidden;border:1px solid var(--border)}
+  .progress>div{height:100%;background:linear-gradient(90deg,var(--blue),var(--accent));width:0%}
+  .status-steps{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .step{padding:6px 8px;border:1px dashed var(--border);border-radius:6px;font-size:12px}
+  .step.active{border-color:var(--blue);color:var(--blue)}
+  .drawer{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);transform:translateY(100%);transition:transform .25s ease;max-height:75vh;overflow:auto}
+  .drawer.open{transform:translateY(0)}
+  .drawer .card{background:transparent;border:none}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{padding:6px 8px;background:#141a22;border:1px solid var(--border);border-radius:999px;font-size:12px}
+  .muted{color:var(--muted)}
+  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+  .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6)}
+  .modal .box{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px;max-width:560px}
+  .hint{font-size:12px;color:var(--muted);margin-top:6px}
+  .badge{padding:2px 8px;border-radius:999px;background:#14331f;color:#9df1c6;font-size:12px}
+  .badge.warn{background:#33290f;color:#f7d58a}
+</style>
+</head>
+<body>
+  <header>
+    <button class="btn ghost" onclick="alert('返回上一頁（原型）')">← 返回</button>
+    <div style="flex:1;font-weight:700">虛擬資產交易</div>
+    <div class="kv">帳戶：虛資交易帳戶｜KYC✅｜餘額 TWD 200,000｜USDT 5,000</div>
+  </header>
+
+  <div class="container">
+    <div class="grid">
+      <!-- 左：資產與市場卡片 + 下單面板 -->
+      <div class="card">
+        <div class="section-title">資產選擇</div>
+        <div id="assetPills">
+          <span class="pill active" onclick="setAsset('BTC')">BTC <span class='mini'>比特幣</span></span>
+          <span class="pill" onclick="setAsset('ETH')">ETH <span class='mini'>以太幣</span></span>
+          <span class="pill" onclick="setAsset('USDT')">USDT <span class='mini'>穩定幣</span></span>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <div>
+            <label>鏈別</label>
+            <select id="chain" onchange="updateMarket()">
+              <option>Ethereum</option>
+              <option>Arbitrum</option>
+              <option>Polygon</option>
+            </select>
+          </div>
+          <div>
+            <label>路由策略</label>
+            <select id="routing" onchange="state.routingPolicy=this.value;refreshFees()">
+              <option value="BEST">最佳</option>
+              <option value="LOW_FEE">低費用</option>
+              <option value="FASTEST">最高速</option>
+              <option value="STABLE">最穩定</option>
+            </select>
+          </div>
+        </div>
+        <div class="card" style="margin-top:12px">
+          <div class="row" style="align-items:center">
+            <div style="flex:1">
+              <div class="kv">即時價格</div>
+              <div id="price" style="font-size:24px;font-weight:800">BTC / TWD 1,500,000</div>
+              <div class="chips" style="margin-top:8px">
+                <span class="chip">24h 漲跌：<span id="chg">+2.8%</span></span>
+                <span class="chip">成交量：<span id="vol">12,500 BTC</span></span>
+                <span class="chip">風險：<span id="risk">中</span></span>
+              </div>
+            </div>
+            <div>
+              <span class="badge">鏈：<span id="chainBadge">Ethereum</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px" class="section-title">下單面板</div>
+        <div class="toggle">
+          <button id="buyBtn" class="active" onclick="setSide('BUY')">買入</button>
+          <button id="sellBtn" onclick="setSide('SELL')">賣出</button>
+        </div>
+        <div class="tabs" style="margin-top:12px">
+          <div id="tMarket" class="tab active" onclick="setOrderType('MARKET')">市價</div>
+          <div id="tLimit" class="tab" onclick="setOrderType('LIMIT')">限價</div>
+          <div id="tTrigger" class="tab" onclick="setOrderType('TRIGGER')">觸發</div>
+          <div id="tCombo" class="tab" onclick="setOrderType('COMBO')">組合</div>
+        </div>
+        <div class="row">
+          <div>
+            <label id="priceLbl">價格 (TWD)</label>
+            <input id="priceInput" type="number" placeholder="例如 1,500,000" oninput="syncPrice()" />
+            <div class="hint" id="priceHint">市價單無需輸入價格</div>
+          </div>
+          <div>
+            <label>數量 (<span id="assetName">BTC</span>)</label>
+            <input id="qtyInput" type="number" placeholder="例如 0.1" oninput="calcEstimations()"/>
+          </div>
+        </div>
+        <div class="row" style="align-items:center;margin-top:8px">
+          <div>
+            <label>以金額下單（TWD / USDT）</label>
+            <input id="amtInput" type="number" placeholder="例如 15,000" oninput="calcFromAmount()"/>
+            <div class="hint">輸入金額將自動計算數量</div>
+          </div>
+          <div>
+            <label>百分比</label>
+            <input id="pctRange" type="range" min="0" max="100" value="0" oninput="applyPct()"/>
+            <div class="hint">快速選擇 25/50/75/100% 可用餘額</div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <div>
+            <label>付款來源</label>
+            <select id="payAsset" onchange="toggleTravelRule()">
+              <option value="TWD">TWD 現金餘額</option>
+              <option value="USDT">USDT 餘額</option>
+              <option value="WALLET">外部錢包 (連線)</option>
+            </select>
+            <div class="hint">託管帳戶與外部錢包皆可使用</div>
+          </div>
+          <div>
+            <label>帳戶模式</label>
+            <div class="toggle">
+              <button id="custodyBtn" class="active" onclick="setCustody('CUSTODY')">合規託管</button>
+              <button id="selfBtn" onclick="setCustody('SELF_CUSTODY')">自託管</button>
+            </div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <div>
+            <label>滑點容忍（%）</label>
+            <input id="slipInput" type="number" value="0.5" step="0.1" oninput="refreshFees()"/>
+            <div class="hint">預設保守值，超出自動中止</div>
+          </div>
+          <div>
+            <label>Gas 模式</label>
+            <select id="gasMode" onchange="refreshFees()">
+              <option value="STANDARD">標準</option>
+              <option value="FAST">快速</option>
+              <option value="SAVER">省</option>
+            </select>
+          </div>
+        </div>
+        <div class="card" style="margin-top:12px">
+          <div class="row">
+            <div>
+              <div class="mini">預估成交金額</div>
+              <div id="estValue" style="font-size:18px;font-weight:700">—</div>
+            </div>
+            <div>
+              <div class="mini">到帳時間</div>
+              <div id="eta">—</div>
+            </div>
+            <div>
+              <div class="mini">確認數</div>
+              <div id="confirm">0/12</div>
+            </div>
+          </div>
+          <div class="fee-list">
+            <div class="mini">平台費</div><div id="feePlatform">—</div>
+            <div class="mini">流動性來源費</div><div id="feeLiq">—</div>
+            <div class="mini">網路費 (Gas)</div><div id="feeNet">—</div>
+            <div class="mini">滑點影響</div><div id="priceImpact">—</div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn" onclick="openPreview()">預覽結算明細</button>
+          <button id="placeBtn" class="btn primary" onclick="placeOrder()" disabled>立即下單</button>
+        </div>
+      </div>
+
+      <!-- 右：成交狀態與回報 -->
+      <div class="card">
+        <div class="section-title">成交狀態</div>
+        <div class="status-steps">
+          <span class="step" id="sQuote">報價</span>
+          <span class="step" id="sPre">前置檢查</span>
+          <span class="step" id="sAuth">授權/簽名</span>
+          <span class="step" id="sPlace">下單</span>
+          <span class="step" id="sBroad">廣播</span>
+          <span class="step" id="sConf">確認</span>
+          <span class="step" id="sPost">入帳</span>
+        </div>
+        <div class="progress" style="margin-top:8px"><div id="progBar"></div></div>
+        <div style="margin-top:8px" class="mono mini">交易哈希：<span id="txHash">—</span></div>
+        <div class="row" style="margin-top:8px">
+          <button class="btn warn" onclick="speedUp()">加速</button>
+          <button class="btn" onclick="copyHash()">分享/複製</button>
+          <button class="btn danger" onclick="cancelTx()">取消</button>
+        </div>
+        <div class="hint">異常狀況（滑點過大、mempool 卡住）會於此提供操作建議</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 結算預覽抽屜 -->
+  <div id="drawer" class="drawer">
+    <div class="container">
+      <div class="card">
+        <div class="section-title">結算預覽</div>
+        <div id="summary" style="margin-bottom:12px">—</div>
+        <div class="section-title">路由與交易資料</div>
+        <div class="chips">
+          <span class="chip">最佳路由：<span id="route">DEX 聚合</span></span>
+          <span class="chip">EIP-712 簽名：<span id="sigType">Typed Data</span></span>
+          <span class="chip">Allowances：<span id="allow">Permit</span></span>
+        </div>
+        <div class="card" style="margin-top:12px">
+          <div class="mini">EIP-712 簽名預覽</div>
+          <pre id="typedData" class="mono" style="overflow:auto;max-height:160px;background:#0e1319;padding:8px;border-radius:8px">{}</pre>
+        </div>
+        <div id="travelRule" style="display:none;margin-top:12px">
+          <div class="section-title">旅行規則｜收款人標識</div>
+          <div class="row">
+            <div><label>收款人姓名</label><input id="benefName" placeholder="例如 王大明"/></div>
+            <div><label>收款人地址</label><input id="benefAddr" placeholder="例如 0xabc..."/></div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn" onclick="closePreview()">返回</button>
+          <button id="authBtn" class="btn primary" onclick="authorize()">同意並簽署/授權</button>
+          <button id="broadcastBtn" class="btn" onclick="broadcast()" disabled>送出並廣播</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模態：滑點過大 -->
+  <div id="slipModal" class="modal">
+    <div class="box">
+      <div class="section-title">滑點過大</div>
+      <div class="muted">目前路由的預估價格影響超過您的滑點容忍。請選擇：</div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn" onclick="adjustSlippage()">提高滑點並重試</button>
+        <button class="btn warn" onclick="switchLowFee()">改用低費用路由</button>
+        <button class="btn ghost" onclick="hideSlipModal()">返回</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const state = {
+    orderId:null, side:'BUY', symbol:'BTC', chain:'Ethereum', orderType:'MARKET',
+    limitPrice:null, quantity:0, amount:0, payAsset:'TWD', accountMode:'CUSTODY',
+    slippagePct:0.5, routingPolicy:'BEST', fees:{platform:0, liquidity:0, network:0},
+    compliance:{kycStatus:'PASSED', travelRule:{required:false, beneficiary:null}},
+    onChain:{needsApprove:false, usePermit:true, txHash:null, confirmations:0, finality:false},
+    status:'PREVIEW', price:1500000
+  }
+  const el = id => document.getElementById(id)
+
+  function setAsset(sym){
+    state.symbol = sym;
+    document.querySelectorAll('#assetPills .pill').forEach(p=>p.classList.remove('active'))
+    [...document.querySelectorAll('#assetPills .pill')].find(p=>p.textContent.trim().startsWith(sym)).classList.add('active')
+    el('assetName').textContent = sym;
+    // mock price
+    const priceMap={BTC:1500000, ETH:52000, USDT:32.2}
+    state.price = priceMap[sym]||1000
+    updateMarket()
+    calcEstimations()
+  }
+  function setSide(s){
+    state.side=s;
+    el('buyBtn').classList.toggle('active', s==='BUY')
+    el('sellBtn').classList.toggle('active', s==='SELL')
+  }
+  function setOrderType(t){
+    state.orderType=t;
+    ['tMarket','tLimit','tTrigger','tCombo'].forEach(id=>el(id).classList.remove('active'))
+    const map={MARKET:'tMarket',LIMIT:'tLimit',TRIGGER:'tTrigger',COMBO:'tCombo'}
+    el(map[t]).classList.add('active')
+    const showPrice = t!=='MARKET'
+    el('priceInput').disabled = !showPrice
+    el('priceHint').textContent = showPrice? '輸入目標價格' : '市價單無需輸入價格'
+    if(!showPrice) el('priceInput').value=''
+    calcEstimations()
+  }
+  function updateMarket(){
+    state.chain = el('chain').value
+    el('chainBadge').textContent = state.chain
+    el('price').textContent = `${state.symbol} / TWD ${fmt(state.price)}`
+    el('chg').textContent = state.symbol==='BTC'? '+2.8%': state.symbol==='ETH'? '+1.4%': '+0.0%'
+    el('vol').textContent = state.symbol==='BTC'? '12,500 BTC': state.symbol==='ETH'? '180,000 ETH': '2.3B USDT'
+    el('risk').textContent = state.symbol==='USDT'? '低': '中'
+  }
+  function fmt(n){
+    return Intl.NumberFormat('zh-Hant-TW',{maximumFractionDigits:2}).format(n)
+  }
+  function calcEstimations(){
+    const price = state.orderType==='MARKET'? state.price : Number(el('priceInput').value||0)
+    const qty = Number(el('qtyInput').value||0)
+    state.quantity = qty
+    const value = price*qty
+    el('estValue').textContent = value? `TWD ${fmt(value)}` : '—'
+    el('eta').textContent = state.chain==='Ethereum'? '≈45 秒' : state.chain==='Arbitrum'? '≈15 秒' : '≈25 秒'
+    el('confirm').textContent = `${state.onChain.confirmations}/12`
+    refreshFees()
+    // enable place when has qty
+    el('placeBtn').disabled = !(qty>0)
+  }
+  function calcFromAmount(){
+    const amt = Number(el('amtInput').value||0)
+    state.amount = amt
+    const price = state.orderType==='MARKET'? state.price : Number(el('priceInput').value||0)
+    const qty = price? (amt/price) : 0
+    el('qtyInput').value = qty? qty.toFixed(6): ''
+    calcEstimations()
+  }
+  function applyPct(){
+    const pct = Number(el('pctRange').value)
+    const base = state.payAsset==='TWD'? 200000 : state.payAsset==='USDT'? 5000*32.2 : 100000
+    const amt = base * pct/100
+    el('amtInput').value = Math.floor(amt)
+    calcFromAmount()
+  }
+  function toggleTravelRule(){
+    state.payAsset = el('payAsset').value
+    const need = state.payAsset==='WALLET'
+    state.compliance.travelRule.required = need
+    el('travelRule').style.display = need? 'block':'none'
+  }
+  function setCustody(m){
+    state.accountMode=m
+    el('custodyBtn').classList.toggle('active', m==='CUSTODY')
+    el('selfBtn').classList.toggle('active', m==='SELF_CUSTODY')
+  }
+  function refreshFees(){
+    state.slippagePct = Number(el('slipInput').value||0.5)
+    state.routingPolicy = el('routing').value
+    const base = Math.max(50, (state.quantity*state.price)*0.001)
+    const platform = Math.round(base)
+    const liquidity = Math.round(base*0.6)
+    let gas = state.chain==='Ethereum'? 180 : state.chain==='Arbitrum'? 60 : 40
+    const mode = el('gasMode').value
+    if(mode==='FAST') gas*=1.8; if(mode==='SAVER') gas*=0.7
+    el('feePlatform').textContent = `TWD ${fmt(platform)}`
+    el('feeLiq').textContent = `TWD ${fmt(liquidity)}`
+    el('feeNet').textContent = `TWD ${fmt(gas)}`
+    const impact = Math.min(4, Math.max(0.1, state.quantity*0.2))
+    el('priceImpact').textContent = `${impact.toFixed(2)}%`
+    state.fees={platform,liquidity,network:Math.round(gas)}
+    // show slip modal if impact > slippage tolerance
+    if(impact > state.slippagePct && state.quantity>0){
+      showSlipModal()
+    }
+  }
+  function showSlipModal(){ el('slipModal').style.display='flex' }
+  function hideSlipModal(){ el('slipModal').style.display='none' }
+  function adjustSlippage(){ el('slipInput').value = (state.slippagePct*1.5).toFixed(2); hideSlipModal(); refreshFees() }
+  function switchLowFee(){ el('routing').value='LOW_FEE'; state.routingPolicy='LOW_FEE'; hideSlipModal(); refreshFees() }
+
+  function openPreview(){
+    const price = state.orderType==='MARKET'? '市價' : `限價 TWD ${fmt(Number(el('priceInput').value||0))}`
+    const qty = state.quantity
+    const pay = state.payAsset
+    el('summary').innerHTML = `交易摘要：<b>${state.side==='BUY'?'買入':'賣出'}</b> <b>${qty}</b> <b>${state.symbol}</b>，${price}，付款來源 <b>${pay}</b>，鏈別 <b>${state.chain}</b>`
+    el('route').textContent = state.routingPolicy==='BEST'? 'DEX 聚合':'CEX 流動池'
+    el('allow').textContent = state.accountMode==='SELF_CUSTODY'? (state.onChain.usePermit?'Permit':'Approve') : '託管內部憑證'
+    const typed = {
+      domain:{name:'Cathay VA Trading',version:'1',chainId:state.chain,type:'EIP-712'},
+      message:{side:state.side,symbol:state.symbol,qty:qty,price:state.orderType==='MARKET'? 'MARKET': Number(el('priceInput').value||0),slippage:state.slippagePct,deadline: Date.now()+10*60*1000},
+      types:{Order:[{name:'side',type:'string'},{name:'symbol',type:'string'},{name:'qty',type:'float'},{name:'price',type:'string'},{name:'slippage',type:'float'},{name:'deadline',type:'uint256'}]}
+    }
+    el('typedData').textContent = JSON.stringify(typed,null,2)
+    el('drawer').classList.add('open')
+  }
+  function closePreview(){ el('drawer').classList.remove('open') }
+  function authorize(){
+    // simulate approve/permit
+    setStep('sAuth')
+    el('broadcastBtn').disabled=false
+    el('authBtn').disabled=true
+  }
+  function broadcast(){
+    setStep('sBroad')
+    state.onChain.txHash = '0x' + Math.random().toString(16).slice(2).padEnd(64,'0')
+    el('txHash').textContent = state.onChain.txHash
+    el('drawer').classList.remove('open')
+    simulateConfirmations()
+  }
+  function placeOrder(){
+    setStep('sPlace')
+    openPreview()
+  }
+  function simulateConfirmations(){
+    setStep('sConf')
+    state.onChain.confirmations = 0
+    const bar = el('progBar')
+    let c=0; const target=12
+    const intv = setInterval(()=>{
+      c++; state.onChain.confirmations=c
+      el('confirm').textContent = `${c}/${target}`
+      bar.style.width = Math.min(100, (c/target*100)).toFixed(2)+'%'
+      if(c>=target){
+        clearInterval(intv)
+        state.onChain.finality=true
+        setStep('sPost')
+      }
+    }, el('gasMode').value==='FAST'? 600 : el('gasMode').value==='SAVER'? 1200 : 900)
+  }
+  function setStep(id){
+    document.querySelectorAll('.status-steps .step').forEach(s=>s.classList.remove('active'))
+    el(id).classList.add('active')
+  }
+  function speedUp(){
+    el('gasMode').value='FAST'; refreshFees();
+    alert('已切換為快速 Gas 模式（原型）')
+  }
+  function copyHash(){
+    if(!state.onChain.txHash){alert('尚無交易哈希');return}
+    navigator.clipboard.writeText(state.onChain.txHash)
+    alert('已複製交易哈希')
+  }
+  function cancelTx(){
+    alert('以替代交易方式嘗試取消（原型示意）')
+    setStep('sPre')
+    el('progBar').style.width='0%'
+    state.onChain.confirmations=0
+    el('confirm').textContent='0/12'
+    el('txHash').textContent='—'
+  }
+  function syncPrice(){ calcEstimations() }
+
+  // init
+  updateMarket();
+</script>
+</body>
+</html>

@@ -1,0 +1,348 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>國泰證券 App｜虛擬資產下單（合規版 Wireframe）</title>
+<style>
+  :root{
+    /* 國泰品牌風格（示意） */
+    --brand:#00a56b;          /* Cathay Green */
+    --brand-600:#00915f;
+    --brand-50:#e7faf3;
+    --text:#111827;           /* 深色文字 */
+    --muted:#6b7280;          /* 次要文字 */
+    --bg:#f7f8fa;             /* App 背景淺灰 */
+    --panel:#ffffff;          /* 主要卡片白底 */
+    --border:#e5e7eb;         /* 邊框灰 */
+    --danger:#e11d48;         /* 錯誤 */
+    --warn:#f59e0b;           /* 警示 */
+    --ok:#059669;             /* 成功 */
+    --blue:#2563eb;           /* 信息藍 */
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", system-ui, sans-serif;}
+  header{position:sticky;top:0;z-index:10;background:var(--panel);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;gap:12px;align-items:center}
+  .title{font-weight:700}
+  .container{max-width:900px;margin:0 auto;padding:12px 16px 72px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px}
+  .section-title{font-weight:700;margin-bottom:8px}
+  .sub{color:var(--muted);font-size:12px}
+  .grid{display:grid;grid-template-columns: 1fr;gap:12px}
+  @media (min-width:920px){ .grid{grid-template-columns: 1.1fr 0.9fr} }
+  .row{display:flex;gap:12px}
+  .row>div{flex:1}
+  label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+  input, select{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:white;color:var(--text)}
+  .toggle{display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:white}
+  .toggle button{flex:1;padding:10px;border:0;background:white;cursor:pointer}
+  .toggle button.active{background:var(--brand-50);color:var(--brand);font-weight:700}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap}
+  .tab{padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:white;cursor:pointer}
+  .tab.active{background:var(--brand-50);border-color:var(--brand);color:var(--brand);font-weight:700}
+  .pill{padding:6px 10px;border:1px solid var(--border);border-radius:999px;margin-right:8px;display:inline-flex;gap:6px;align-items:center;background:white;cursor:pointer}
+  .pill.active{background:var(--brand-50);border-color:var(--brand);color:var(--brand)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{padding:6px 8px;border:1px solid var(--border);border-radius:999px;font-size:12px;background:#fafafa}
+  .btn{padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:white;cursor:pointer}
+  .btn.primary{background:var(--brand);color:white;border-color:var(--brand-600);font-weight:700}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn.warn{background:#fff7ed;border-color:#fed7aa;color:#b45309}
+  .btn.ghost{background:transparent}
+  .kv{display:flex;gap:8px;align-items:center;color:var(--muted)}
+  .fee-list{display:grid;grid-template-columns: 1fr auto;gap:6px}
+  .progress{height:6px;background:#eef2ff;border-radius:999px;overflow:hidden}
+  .progress>div{height:100%;background:linear-gradient(90deg,var(--blue),var(--brand));width:0%}
+  .status-steps{display:flex;gap:6px;flex-wrap:wrap}
+  .step{padding:4px 8px;border:1px dashed var(--border);border-radius:999px;font-size:12px;color:var(--muted)}
+  .step.active{border-color:var(--brand);color:var(--brand)}
+  .helper{font-size:12px;color:var(--muted);margin-top:6px}
+  .error{color:var(--danger);font-size:12px;margin-top:6px;display:none}
+  .disclosure{border:1px solid #c7eadc;background:#f3fbf7;border-radius:12px;padding:12px;display:flex;gap:12px;align-items:flex-start}
+  .disclosure .icon{width:20px;height:20px;border-radius:50%;background:var(--brand);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+  .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--panel);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 0}
+  .bottom-nav .item{display:flex;flex-direction:column;align-items:center;font-size:12px;color:var(--muted)}
+  .bottom-nav .item.active{color:var(--brand);font-weight:700}
+  .switch{display:flex;align-items:center;gap:8px}
+  .switch input{width:auto}
+  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;}
+  .link{color:var(--blue);text-decoration:underline;cursor:pointer}
+  .divider{height:1px;background:var(--border);margin:8px 0}
+  .toast{position:fixed;right:12px;bottom:72px;background:#111827;color:#fff;padding:10px 12px;border-radius:10px;display:none}
+</style>
+</head>
+<body>
+  <!-- 頂部導覽（符合國泰既有 App 結構） -->
+  <header>
+    <button class="btn" onclick="alert('返回（原型）')">←</button>
+    <div class="title" style="flex:1">虛擬資產下單</div>
+    <div class="kv">KYC ✅｜餘額：TWD <span id="balTwd">200,000</span>｜USDT <span id="balUsdt">5,000</span></div>
+  </header>
+
+  <div class="container">
+    <!-- 合規披露（台灣法規：風險預告 + 勾選） -->
+    <div class="disclosure card">
+      <div class="icon">i</div>
+      <div style="flex:1">
+        <div style="font-weight:700">虛擬資產風險揭露</div>
+        <div class="sub">虛擬資產價格高度波動，可能導致本金重大損失；相關交易不受存款保險或保證基金保障。請詳閱「<span class="link" onclick="openRiskDoc()">虛擬資產風險預告書</span>」。</div>
+        <div class="switch" style="margin-top:8px">
+          <input type="checkbox" id="riskAck" onchange="checkAck()"/>
+          <label for="riskAck" style="margin:0">我已閱讀並同意虛擬資產風險預告書</label>
+        </div>
+        <div id="ackError" class="error">須勾選同意後方可下單。</div>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-top:12px">
+      <!-- 左：交易框架（核心功能） -->
+      <div class="card">
+        <div class="section-title">交易對與市場</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="pill active" onclick="setAsset('BTC')">BTC/TWD</span>
+          <span class="pill" onclick="setAsset('ETH')">ETH/TWD</span>
+          <span class="pill" onclick="setAsset('USDT')">USDT/TWD</span>
+          <div style="margin-left:auto" class="sub">鏈：
+            <select id="chain" onchange="updateMarket()" style="width:auto">
+              <option>Ethereum</option>
+              <option>Arbitrum</option>
+              <option>Polygon</option>
+            </select>
+          </div>
+        </div>
+        <div class="chips" style="margin-top:8px">
+          <span class="chip">即時價格：<b id="price">BTC/TWD 1,500,000</b></span>
+          <span class="chip">24h：<span id="chg">+2.8%</span></span>
+          <span class="chip">風險等級：<span id="risk">中</span></span>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section-title">下單</div>
+        <div class="toggle">
+          <button id="buyBtn" class="active" onclick="setSide('BUY')">買入</button>
+          <button id="sellBtn" onclick="setSide('SELL')">賣出</button>
+        </div>
+
+        <div class="tabs" style="margin-top:8px">
+          <div id="tMarket" class="tab active" onclick="setOrderType('MARKET')">市價</div>
+          <div id="tLimit" class="tab" onclick="setOrderType('LIMIT')">限價</div>
+        </div>
+
+        <div class="row" style="margin-top:8px">
+          <div>
+            <label id="priceLbl">價格 (TWD)</label>
+            <input id="priceInput" type="number" placeholder="例如 1,500,000" oninput="syncPrice()" disabled />
+            <div id="priceHint" class="helper">市價單無需輸入價格</div>
+          </div>
+          <div>
+            <label>輸入金額 (TWD)</label>
+            <input id="amtInput" type="number" placeholder="例如 30,000" oninput="calcFromAmount()"/>
+            <div class="helper">系統將自動換算數量</div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:8px">
+          <div>
+            <label>預估數量 (<span id="assetName">BTC</span>)</label>
+            <input id="qtyInput" type="number" placeholder="例如 0.02" oninput="calcEstimations()"/>
+            <div id="balError" class="error">餘額不足，請調整金額或改用 USDT。</div>
+          </div>
+          <div>
+            <label>使用餘額</label>
+            <select id="payAsset" onchange="recheckBalance()">
+              <option value="TWD">TWD 現金餘額</option>
+              <option value="USDT">USDT 餘額</option>
+            </select>
+            <div class="helper">可用：TWD <span id="availTwd">200,000</span>｜USDT <span id="availUsdt">5,000</span></div>
+          </div>
+        </div>
+
+        <div class="card" style="background:#fafafa;margin-top:12px">
+          <div class="row">
+            <div>
+              <div class="sub">預估成交金額</div>
+              <div id="estValue" style="font-weight:700">—</div>
+            </div>
+            <div>
+              <div class="sub">到帳時間</div>
+              <div id="eta">—</div>
+            </div>
+          </div>
+          <div class="fee-list" style="margin-top:8px">
+            <div class="sub">平台手續費</div><div id="feePlatform">—</div>
+            <div class="sub">流動性費</div><div id="feeLiq">—</div>
+            <div class="sub">網路費 (Gas)</div><div id="feeNet">—</div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:12px">
+          <button class="btn" onclick="preview()">預覽</button>
+          <button id="submitBtn" class="btn primary" onclick="place()" disabled>買入</button>
+        </div>
+        <div class="helper">需勾選風險預告書並通過餘額檢查後才可下單。</div>
+      </div>
+
+      <!-- 右：成交狀態（簡化） -->
+      <div class="card">
+        <div class="section-title">成交狀態</div>
+        <div class="status-steps">
+          <span class="step" id="sPre">前置檢查</span>
+          <span class="step" id="sAuth">授權/簽名</span>
+          <span class="step" id="sPlace">下單</span>
+          <span class="step" id="sBroad">廣播</span>
+          <span class="step" id="sConf">確認</span>
+          <span class="step" id="sPost">入帳</span>
+        </div>
+        <div class="progress" style="margin-top:8px"><div id="prog" style="width:0%"></div></div>
+        <div class="sub" style="margin-top:6px">交易哈希：<span class="mono" id="txHash">—</span></div>
+        <div class="row" style="margin-top:8px">
+          <button class="btn warn" onclick="speedUp()">加速</button>
+          <button class="btn" onclick="copyHash()">複製哈希</button>
+          <button class="btn" onclick="resetFlow()">重置</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部導覽（遵循既有規範） -->
+  <nav class="bottom-nav">
+    <div class="item">首頁</div>
+    <div class="item active">交易</div>
+    <div class="item">資產</div>
+    <div class="item">訊息</div>
+    <div class="item">我的</div>
+  </nav>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">已切換為快速 Gas 模式（示意）</div>
+
+  <!-- 風險預告書（簡化示意） -->
+  <dialog id="riskDoc" style="border:none;border-radius:12px;max-width:720px;width:90%">
+    <div style="padding:16px">
+      <div style="font-weight:700;margin-bottom:8px">虛擬資產風險預告書（摘要）</div>
+      <ol class="sub" style="line-height:1.6">
+        <li>價格波動劇烈，可能導致損失超過投入本金；</li>
+        <li>交易涉及智能合約、橋接與對手風險；</li>
+        <li>網路擁塞將影響到帳時間與費用；</li>
+        <li>資產可能面臨監管政策變動之風險。</li>
+      </ol>
+      <div class="row" style="margin-top:12px">
+        <button class="btn" onclick="closeRiskDoc()">關閉</button>
+        <button class="btn primary" onclick="ackInDoc()">我已閱讀</button>
+      </div>
+    </div>
+  </dialog>
+
+<script>
+  const el=id=>document.getElementById(id)
+  const state={
+    side:'BUY', symbol:'BTC', price:1500000, orderType:'MARKET', amount:0, qty:0,
+    bal:{TWD:200000, USDT:5000}, chain:'Ethereum',
+    fees:{platform:0, liq:0, gas:0}, riskAck:false, hash:null
+  }
+  function fmt(n, opt={}){return Intl.NumberFormat('zh-Hant-TW', {maximumFractionDigits: opt.dp??2}).format(n)}
+
+  function setAsset(sym){
+    state.symbol=sym; el('assetName').textContent=sym; 
+    document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'))
+    const target=[...document.querySelectorAll('.pill')].find(p=>p.textContent.includes(sym))
+    if(target) target.classList.add('active')
+    const pm={BTC:1500000, ETH:52000, USDT:32.2}
+    state.price=pm[sym]||1000
+    updateMarket(); calcEstimations();
+  }
+  function updateMarket(){
+    state.chain = el('chain').value
+    el('price').textContent = `${state.symbol}/TWD ${fmt(state.price,{dp:0})}`
+    el('chg').textContent = state.symbol==='BTC'? '+2.8%': state.symbol==='ETH'? '+1.4%': '+0.0%'
+    el('risk').textContent = state.symbol==='USDT'? '低':'中'
+    eta();
+  }
+  function setSide(s){
+    state.side=s; el('buyBtn').classList.toggle('active', s==='BUY'); el('sellBtn').classList.toggle('active', s==='SELL')
+    el('submitBtn').textContent = s==='BUY'? '買入':'賣出'
+  }
+  function setOrderType(t){
+    state.orderType=t; ['tMarket','tLimit'].forEach(i=>el(i).classList.remove('active'))
+    el(t==='MARKET'?'tMarket':'tLimit').classList.add('active')
+    const showPrice = t==='LIMIT'
+    el('priceInput').disabled=!showPrice
+    el('priceHint').textContent = showPrice? '請輸入目標價格':'市價單無需輸入價格'
+    if(!showPrice) el('priceInput').value=''
+    calcEstimations()
+  }
+  function calcFromAmount(){
+    const amt=Number(el('amtInput').value||0); state.amount=amt
+    const px= state.orderType==='MARKET'? state.price : Number(el('priceInput').value||0)
+    const qty= px? amt/px:0; el('qtyInput').value = qty? qty.toFixed(6): ''
+    calcEstimations()
+  }
+  function calcEstimations(){
+    const px= state.orderType==='MARKET'? state.price : Number(el('priceInput').value||0)
+    const qty= Number(el('qtyInput').value||0); state.qty=qty
+    const est= px*qty
+    el('estValue').textContent = est? `TWD ${fmt(est,{dp:0})}`:'—'
+    fees()
+    recheckBalance()
+    checkAck()
+  }
+  function fees(){
+    const trade = (state.orderType==='MARKET'? state.price : Number(el('priceInput').value||0)) * (state.qty||0)
+    const platform = Math.max(50, trade*0.001)
+    const liq = Math.max(30, trade*0.0006)
+    let gas = state.chain==='Ethereum'? 180 : state.chain==='Arbitrum'? 60 : 40
+    el('feePlatform').textContent = `TWD ${fmt(platform,{dp:0})}`
+    el('feeLiq').textContent = `TWD ${fmt(liq,{dp:0})}`
+    el('feeNet').textContent = `TWD ${fmt(gas,{dp:0})}`
+    state.fees={platform, liq, gas}
+  }
+  function eta(){
+    el('eta').textContent = state.chain==='Ethereum'? '≈45 秒' : state.chain==='Arbitrum'? '≈15 秒' : '≈25 秒'
+  }
+  function recheckBalance(){
+    const pay=el('payAsset').value
+    const needTwd = (state.orderType==='MARKET'? state.price : Number(el('priceInput').value||0)) * (state.qty||0)
+    const ok = pay==='TWD'? state.bal.TWD>=needTwd : (state.bal.USDT*32.2)>=needTwd
+    el('balError').style.display = ok? 'none':'block'
+    controlSubmit()
+  }
+  function checkAck(){
+    state.riskAck = el('riskAck').checked
+    el('ackError').style.display = state.riskAck? 'none':'block'
+    controlSubmit()
+  }
+  function controlSubmit(){
+    const validQty = (state.qty||0) > 0
+    const hasEst = !!el('estValue').textContent && el('estValue').textContent!=='—'
+    const noErr = el('balError').style.display==='none' && el('ackError').style.display==='none'
+    el('submitBtn').disabled = !(validQty && hasEst && noErr)
+  }
+  function preview(){
+    alert(`預覽：${state.side} ${state.qty} ${state.symbol}，型態=${state.orderType}`)
+  }
+  function place(){
+    setStep('sPre'); progress(10)
+    setTimeout(()=>{ setStep('sAuth'); progress(30) }, 400)
+    setTimeout(()=>{ setStep('sPlace'); progress(50) }, 900)
+    setTimeout(()=>{ setStep('sBroad'); progress(70); genHash() }, 1300)
+    setTimeout(()=>{ setStep('sConf'); progress(90) }, 2200)
+    setTimeout(()=>{ setStep('sPost'); progress(100) }, 3600)
+  }
+  function setStep(id){ document.querySelectorAll('.step').forEach(s=>s.classList.remove('active')); el(id).classList.add('active') }
+  function progress(p){ el('prog').style.width=p+'%' }
+  function genHash(){ state.hash='0x'+Math.random().toString(16).slice(2).padEnd(64,'0'); el('txHash').textContent=state.hash }
+  function speedUp(){ toast(); }
+  function copyHash(){ if(!state.hash){alert('尚無交易哈希');return} navigator.clipboard.writeText(state.hash); alert('已複製交易哈希') }
+  function resetFlow(){ document.querySelectorAll('.step').forEach(s=>s.classList.remove('active')); progress(0); el('txHash').textContent='—'; state.hash=null }
+  function openRiskDoc(){ el('riskDoc').showModal() }
+  function closeRiskDoc(){ el('riskDoc').close() }
+  function ackInDoc(){ el('riskAck').checked=true; checkAck(); closeRiskDoc() }
+  function toast(){ const t=el('toast'); t.style.display='block'; setTimeout(()=>t.style.display='none',1500) }
+
+  // 初始化
+  updateMarket(); controlSubmit();
+</script>
+</body>
+</html>
